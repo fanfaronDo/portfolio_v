@@ -1,0 +1,28 @@
+version: '3.8'
+
+
+services:
+  mysql: 
+    image: mysql:latest
+    container_name: mysql
+    volumes:
+      - mysqldb:/var/lib/mysql
+      - ./schema:/docker-entrypoint-initdb.d 
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: portfolio
+      MYSQL_USER: mysql 
+      MYSQL_PASSWORD: root
+    networks:
+      portfolio_net:
+        ipv4_address: 192.168.56.103
+
+volumes:
+  mysqldb:
+  
+networks:
+  portfolio_net:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 192.168.56.0/24
