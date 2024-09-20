@@ -17,9 +17,14 @@ func NewHandler(service *service.Service) *Handler {
 
 func (h *Handler) InitRoutes() *gin.Engine {
 	router := gin.New()
-	projectsRange := router.Group("/")
+	projects := router.Group("/")
 	{
-		projectsRange.GET("/", h.getProjects)
+		projects.GET("/ping", func(c *gin.Context) {
+			c.JSON(200, gin.H{"message": "pong"})
+			return
+		})
+
+		projects.GET("/", h.getProjects)
 	}
 
 	return router

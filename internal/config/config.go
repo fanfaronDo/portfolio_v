@@ -30,7 +30,7 @@ type Mysql struct {
 	Database string `yaml:"database" env-default:"portfolio"`
 }
 
-func ConfigLoad() *Config {
+func ConfigLoad() (Config, error) {
 	configPath := os.Getenv("CONFIG_PATH")
 	if configPath == "" {
 		configPath = defaultConfigPath
@@ -39,11 +39,13 @@ func ConfigLoad() *Config {
 	if _, err := os.Stat(configPath); os.IsNotExist(err) {
 		log.Fatal("CONFIG_PATH does not exist:", configPath)
 	}
+
 	var config Config
 
 	if err := cleanenv.ReadConfig(configPath, &config); err != nil {
 		log.Fatal("Cannot read config:", err)
+		return Config{}, err
 	}
 
-	return &config
+	return config, nil
 }

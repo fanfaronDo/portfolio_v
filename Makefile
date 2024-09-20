@@ -1,3 +1,6 @@
+run:
+	@go run ./cmd/app/main.go
+
 build:
 	go build -o portfolio_run ./cmd/app/main.go
 

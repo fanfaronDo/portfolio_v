@@ -15,7 +15,7 @@ func NewProjects(db *sql.DB) *ProjectsMysql {
 
 func (p *ProjectsMysql) GetProjects(limit, offset int) ([]domain.Project, error) {
 	var projects []domain.Project
-	query := "SELECT title, description, image FROM projects OFFSET $1 LIMIT $2"
+	query := "SELECT title, description, image FROM projects LIMIT ? OFFSET ?;"
 	rows, err := p.db.Query(query, limit, offset)
 	if err != nil {
 		return projects, err
@@ -60,7 +60,7 @@ func (p *ProjectsMysql) GetAll() ([]domain.Project, error) {
 
 func (p *ProjectsMysql) GetTotal() (int, error) {
 	var total int
-	err := p.db.QueryRow("SELECT count(project_id) FROM projects").Scan(&total)
+	err := p.db.QueryRow("SELECT count(id) FROM projects;").Scan(&total)
 	if err != nil {
 		return 0, err
 	}

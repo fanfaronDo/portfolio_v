@@ -23,6 +23,7 @@ func (h *Handler) getProjects(c *gin.Context) {
 	paramID, ok := c.GetQuery("projects")
 	if !ok {
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": paramID + " is required"})
+		return
 	}
 	if paramID == "" {
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": "Param ID not found"})
@@ -32,11 +33,13 @@ func (h *Handler) getProjects(c *gin.Context) {
 	id, err := strconv.Atoi(paramID)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": "Param ID must be an integer"})
+		return
 	}
 	total, err := h.service.Projects.GetTotal()
 	projects, err := h.service.Projects.GetProjects(Limit, id)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
 	}
 
 	pagination := Pagination{}

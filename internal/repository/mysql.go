@@ -9,7 +9,7 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 )
 
-func NewMySql(cfg config.Mysql) (*sql.DB, error) {
+func NewMySql(cfg *config.Mysql) (*sql.DB, error) {
 	conn, err := sql.Open("mysql", fmt.Sprintf("%s:%s@tcp(%s:%s)/%s",
 		cfg.User,
 		cfg.Password,
