@@ -10,10 +10,10 @@ type Server struct {
 	httpServer *http.Server
 }
 
-func (server *Server) Run(ip, port string, httpHandler http.Handler) error {
+func (server *Server) Run(ip, port string, handler http.Handler) error {
 	server.httpServer = &http.Server{
 		Addr:           ip + ":" + port,
-		Handler:        httpHandler,
+		Handler:        handler,
 		MaxHeaderBytes: 1 << 20,
 		ReadTimeout:    10 * time.Second,
 		WriteTimeout:   10 * time.Second,

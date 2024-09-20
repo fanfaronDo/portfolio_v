@@ -1,24 +1,21 @@
 package main
 
 import (
-	"github.com/fanfaronDo/portfolio_v/internal/config"
-	"github.com/fanfaronDo/portfolio_v/internal/repository"
-	"github.com/fanfaronDo/portfolio_v/internal/service"
-	"log"
+	"fmt"
+	"os"
+	"path/filepath"
 )
 
-func main() {
-	cfg := config.ConfigLoad()
-	conn, err := repository.NewMySql(*cfg)
-	if err != nil {
-		log.Println("panic occurred:", err)
+func setTemplatePath(args ...string) string {
+	currentDir, _ := os.Getwd()
+	filePath := filepath.Join(currentDir)
+	for _, arg := range args {
+		filePath += string(filepath.Separator) + arg
 	}
-	repo := repository.NewRepository(conn)
-	service := service.NewService(repo)
 
-	service.Delete(3)
-	//p := handler.NewTemplatePaginationPage(20, 7)
-	//fmt.Println(p)
-	//d, err := service.Projects.GetRange(p.StartProjectEdge, p.EndProjectEdge)
-	//fmt.Println(d, err)
+	return filePath
+}
+
+func main() {
+	fmt.Println(setTemplatePath("first", "second", "third", "fourth"))
 }

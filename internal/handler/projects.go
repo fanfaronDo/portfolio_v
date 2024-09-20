@@ -3,7 +3,11 @@ package handler
 import (
 	"github.com/fanfaronDo/portfolio_v/internal/domain"
 	"github.com/gin-gonic/gin"
+	"html/template"
+	"io/ioutil"
 	"net/http"
+	"os"
+	"path/filepath"
 	"strconv"
 )
 
@@ -35,6 +39,7 @@ func (h *Handler) getProjects(c *gin.Context) {
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": "Param ID must be an integer"})
 		return
 	}
+
 	total, err := h.service.Projects.GetTotal()
 	projects, err := h.service.Projects.GetProjects(Limit, id)
 	if err != nil {
@@ -49,5 +54,35 @@ func (h *Handler) getProjects(c *gin.Context) {
 	pagination.TotalPage = total
 	pagination.RecordPerPage = projects
 
-	c.JSON(http.StatusOK, pagination)
+	filePath := setTemplatePath("web", "template", "main.html")
+	file, err := ioutil.ReadFile(filePath)
+
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	tmp, err := template.New("projects").Parse(string(file))
+
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	err = tmp.Execute(c.Writer, pagination)
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+}
+
+func setTemplatePath(args ...string) string {
+	currentDir, _ := os.Getwd()
+	filePath := filepath.Join(currentDir)
+	for _, arg := range args {
+		filePath += string(filepath.Separator) + arg
+	}
+
+	return filePath
 }
