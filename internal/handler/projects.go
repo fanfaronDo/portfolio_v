@@ -3,8 +3,6 @@ package handler
 import (
 	"github.com/fanfaronDo/portfolio_v/internal/domain"
 	"github.com/gin-gonic/gin"
-	"html/template"
-	"io/ioutil"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -24,7 +22,7 @@ const (
 )
 
 func (h *Handler) getProjects(c *gin.Context) {
-	paramID, ok := c.GetQuery("projects")
+	paramID, ok := c.GetQuery("path")
 	if !ok {
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": paramID + " is required"})
 		return
@@ -54,27 +52,85 @@ func (h *Handler) getProjects(c *gin.Context) {
 	pagination.TotalPage = total
 	pagination.RecordPerPage = projects
 
-	filePath := setTemplatePath("web", "template", "main.html")
-	file, err := ioutil.ReadFile(filePath)
+	c.JSON(http.StatusOK, pagination.RecordPerPage)
 
+	//filePath := setTemplatePath("web", "template", "main.html")
+	//file, err := ioutil.ReadFile(filePath)
+
+	//if err != nil {
+	//	c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+	//	return
+	//}
+
+	//tmp, err := template.New("projects").Parse(string(file))
+
+	//if err != nil {
+	//	c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+	//	return
+	//}
+
+	//err = tmp.Execute(c.Writer, pagination)
+
+	//if err != nil {
+	//	c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+	//	return
+	//}
+}
+
+func (h *Handler) getProject(c *gin.Context) {
+	projectId := c.Param("id")
+	id, err := strconv.Atoi(projectId)
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": "Param ID must be an integer"})
+		return
+	}
+
+	project, err := h.service.GetById(id)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
-	tmp, err := template.New("projects").Parse(string(file))
+	c.JSON(http.StatusOK, project)
+}
 
+func (h *Handler) createProject(c *gin.Context) {
+	var project domain.Project
+	if err := c.Bind(&project); err != nil {
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	err := h.service.Create(project)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
-	err = tmp.Execute(c.Writer, pagination)
+	c.JSON(http.StatusCreated, project)
+}
+
+func (h *Handler) updateProject(c *gin.Context) {
+	projectId := c.Param("id")
+	id, err := strconv.Atoi(projectId)
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": "Param ID must be an integer"})
+		return
+	}
+
+	var project domain.Project
+	if err = c.Bind(&project); err != nil {
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	err = h.service.Update(id, project)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
+	c.JSON(http.StatusOK, project)
 }
 
 func setTemplatePath(args ...string) string {

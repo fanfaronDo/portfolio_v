@@ -17,7 +17,7 @@ func NewHandler(service *service.Service) *Handler {
 
 func (h *Handler) InitRoutes() *gin.Engine {
 	router := gin.New()
-	projects := router.Group("/")
+	projects := router.Group("/projects")
 	{
 		projects.GET("/ping", func(c *gin.Context) {
 			c.JSON(200, gin.H{"message": "pong"})
@@ -25,6 +25,14 @@ func (h *Handler) InitRoutes() *gin.Engine {
 		})
 
 		projects.GET("/", h.getProjects)
+		projects.GET("/:id", h.getProject)
+
+	}
+
+	admin := router.Group("/admin")
+	{
+		admin.POST("/", h.createProject)
+		admin.PATCH("/", h.updateProject)
 	}
 
 	return router

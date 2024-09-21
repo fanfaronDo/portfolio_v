@@ -32,7 +32,7 @@ func main() {
 
 	r := handler.InitRoutes()
 	go func() {
-		if err := server.Run(cfg.HttpServer.Address, cfg.HttpServer.Port, r); err != nil {
+		if err = server.Run(cfg.HttpServer.Address, cfg.HttpServer.Port, r); err != nil {
 			fmt.Printf("error occured while running http server: %s\n", err.Error())
 			return
 		}
