@@ -1,0 +1,8 @@
+
+CREATE TABLE IF NOT EXISTS projects (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    title VARCHAR(255) NOT NULL DEFAULT '',
+    description TEXT,
+    url VARCHAR(255) NOT NULL,
+    image VARCHAR(255) NOT NULL DEFAULT ''
+);

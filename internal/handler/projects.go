@@ -53,28 +53,6 @@ func (h *Handler) getProjects(c *gin.Context) {
 	pagination.RecordPerPage = projects
 
 	c.JSON(http.StatusOK, pagination.RecordPerPage)
-
-	//filePath := setTemplatePath("web", "template", "main.html")
-	//file, err := ioutil.ReadFile(filePath)
-
-	//if err != nil {
-	//	c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-	//	return
-	//}
-
-	//tmp, err := template.New("projects").Parse(string(file))
-
-	//if err != nil {
-	//	c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-	//	return
-	//}
-
-	//err = tmp.Execute(c.Writer, pagination)
-
-	//if err != nil {
-	//	c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-	//	return
-	//}
 }
 
 func (h *Handler) getProject(c *gin.Context) {
