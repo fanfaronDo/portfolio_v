@@ -3,9 +3,9 @@ package handler
 import (
 	"github.com/fanfaronDo/portfolio_v/internal/domain"
 	"github.com/gin-gonic/gin"
+	"html/template"
+	"math"
 	"net/http"
-	"os"
-	"path/filepath"
 	"strconv"
 )
 
@@ -18,11 +18,12 @@ type Pagination struct {
 }
 
 const (
-	Limit = 4
+	Limit = 3
 )
 
 func (h *Handler) getProjects(c *gin.Context) {
 	paramID, ok := c.GetQuery("path")
+
 	if !ok {
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": paramID + " is required"})
 		return
@@ -39,7 +40,13 @@ func (h *Handler) getProjects(c *gin.Context) {
 	}
 
 	total, err := h.service.Projects.GetTotal()
-	projects, err := h.service.Projects.GetProjects(Limit, id)
+	offset := id
+	offset -= 1
+	if offset != 0 || offset != total {
+		offset *= Limit
+	}
+
+	projects, err := h.service.Projects.GetProjects(Limit, offset)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -49,10 +56,23 @@ func (h *Handler) getProjects(c *gin.Context) {
 	pagination.Next = id + 1
 	pagination.Previous = id - 1
 	pagination.CurrentPage = id
-	pagination.TotalPage = total
+	pagination.TotalPage = int(math.Ceil(float64(total) / float64(Limit)))
 	pagination.RecordPerPage = projects
 
-	c.JSON(http.StatusOK, pagination.RecordPerPage)
+	tmpl, err := template.ParseFiles("web/templates/main.html")
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to create templates"})
+		return
+	}
+
+	c.Header("Content-Type", "text/html")
+	err = tmpl.Execute(c.Writer, pagination)
+	if err != nil {
+		if _, err := c.Writer.WriteString("Page not found 404"); err != nil {
+			return
+		}
+		return
+	}
 }
 
 func (h *Handler) getProject(c *gin.Context) {
@@ -109,14 +129,4 @@ func (h *Handler) updateProject(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, project)
-}
-
-func setTemplatePath(args ...string) string {
-	currentDir, _ := os.Getwd()
-	filePath := filepath.Join(currentDir)
-	for _, arg := range args {
-		filePath += string(filepath.Separator) + arg
-	}
-
-	return filePath
 }

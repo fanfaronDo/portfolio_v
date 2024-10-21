@@ -18,8 +18,8 @@ func NewProject(db *sql.DB) *ProjectMysql {
 }
 
 func (p *ProjectMysql) Create(project domain.Project) error {
-	query := "insert into projects (title, description, image) values (?, ?, ?)"
-	insert, err := p.db.Query(query, project.Title, project.Description, project.Image)
+	query := "insert into projects (title, description, url, image) values (?, ?, ?, ?)"
+	insert, err := p.db.Query(query, project.Title, project.Description, project.Url, project.Image)
 	defer insert.Close()
 	if err != nil {
 		log.Printf("Project %s is not added: %v\n", project.Title, err)
