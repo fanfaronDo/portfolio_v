@@ -7,8 +7,16 @@ build:
 build_test:
 	go build -o test ./cmd/test/main.go
 
-migrationup:
-	migrate -source file://migrations -database "mysql://mysql:root@tcp(192.168.56.2:3306)/portfolio" up
+ttt:
+	export PATH=$(PATH):/usr/local/go/bin
+	echo $(go env)
 
-migrationdown:
-	migrate -source file://migrations -database "mysql://mysql:root@tcp(192.168.56.2:3306)/portfolio" down
+# install_migrate:
+# 	@go install -tags 'postgres' github.com/golang-migrate/migrate/v4/cmd/migrate@latest
+# 	@echo "alais migrate=$(go env GOPATH)/bin/migrate"
+
+migrationup: install_migrate
+	@migrate -source file://migrations -database "mysql://$(MYSQL_USER):$(MYSQL_PASSWORD)@tcp($(MYSQL_HOST))/$(MYSQL_DATABASE)" up
+ 
+# migrationdown: export_tools
+# 	migrate -source file://migrations -database "mysql://$(MYSQL_USER):$(MYSQL_PASSWORD)@tcp(192.168.56.2:3306)/$(MYSQL_DATABASE)" down
